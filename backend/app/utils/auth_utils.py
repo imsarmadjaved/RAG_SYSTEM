@@ -9,7 +9,9 @@ from app.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-def hash_password(password):
+def hash_password(password: str) -> str:
+    # Truncate to 72 bytes for bcrypt compatibility
+    password = password.encode('utf-8')[:72].decode('utf-8', errors='ignore')
     return pwd_context.hash(password)
 
 def verify_password(plain, hashed):
