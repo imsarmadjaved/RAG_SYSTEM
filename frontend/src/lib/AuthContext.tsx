@@ -1,6 +1,12 @@
 ﻿"use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import api from "./api";
 import { User } from "./types";
@@ -13,7 +19,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
-interface SignupData {
+export interface SignupData {
   email: string;
   password: string;
   full_name: string;
@@ -30,7 +36,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = useCallback(async () => {
     const token = localStorage.getItem("access_token");
-    if (!token) { setLoading(false); return; }
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
       const { data } = await api.get("/auth/me");
       setUser(data);
@@ -41,7 +50,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  useEffect(() => { checkAuth(); }, [checkAuth]);
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const login = async (email: string, password: string): Promise<User> => {
     const { data } = await api.post("/auth/login", { email, password });
