@@ -9,7 +9,7 @@ class SearchService:
     
     async def search(self, query_text, email, chunk_types=None, top_k=30):
         try:
-            resp = self.client.models.embed_content(model="text-embedding-004", contents=query_text)
+            resp = self.client.models.embed_content(model="embedding-001", contents=query_text)
             vec = resp.embeddings[0].values
             
             results = self.index.query(vector=vec, filter={"email": email}, top_k=top_k, include_metadata=True)

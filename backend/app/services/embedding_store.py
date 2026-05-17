@@ -15,7 +15,7 @@ class EmbeddingStore:
             embeddings = []
             for text in texts:
                 resp = self.client.models.embed_content(
-                    model="text-embedding-004",
+                    model="embedding-001",
                     contents=text
                 )
                 embeddings.append(resp.embeddings[0].values)
