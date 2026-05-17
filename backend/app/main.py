@@ -1,4 +1,4 @@
-ï»¿from fastapi import FastAPI, Request
+Ã¯Â»Â¿from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
@@ -69,4 +69,3 @@ async def root():
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=True)
-# Force redeploy v2
