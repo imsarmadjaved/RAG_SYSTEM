@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+﻿from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
@@ -56,6 +56,8 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(documents.router, prefix="/api/documents", tags=["Documents"])
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
 app.include_router(recruiter.router, prefix="/api/recruiter", tags=["Recruiter"])
+from app.routes import debug
+app.include_router(debug.router, prefix="/api/chat", tags=["Debug"])
 
 @app.get("/api/health")
 async def health():
