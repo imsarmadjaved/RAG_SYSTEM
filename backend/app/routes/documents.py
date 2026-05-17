@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from app.services.pdf_processor import PDFProcessor
 from app.dependencies import get_db
 from app.utils.auth_utils import get_current_active_user

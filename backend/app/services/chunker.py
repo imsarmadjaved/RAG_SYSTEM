@@ -1,4 +1,4 @@
-﻿import re, tiktoken
+import re, tiktoken
 from app.config import settings
 from loguru import logger
 

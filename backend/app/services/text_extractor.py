@@ -1,4 +1,4 @@
-﻿import fitz
+import fitz
 from app.models.document import ExtractionQuality
 from app.utils.errors import AppError, ErrorCode
 from loguru import logger

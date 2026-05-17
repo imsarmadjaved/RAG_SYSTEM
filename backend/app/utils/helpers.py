@@ -1,4 +1,4 @@
-﻿import uuid, re
+import uuid, re
 
 def generate_task_id():
     return f"task_{uuid.uuid4().hex[:8]}"

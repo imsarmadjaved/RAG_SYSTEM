@@ -1,4 +1,4 @@
-﻿from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from pinecone import Pinecone
 from google import genai
 from loguru import logger

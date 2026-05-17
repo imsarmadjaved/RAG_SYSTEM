@@ -1,4 +1,4 @@
-﻿import asyncio
+import asyncio
 from datetime import datetime
 from app.models.document import DocumentStatus
 from app.utils.helpers import generate_task_id, sanitize_filename

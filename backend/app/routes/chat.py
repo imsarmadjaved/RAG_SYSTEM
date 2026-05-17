@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from app.models.chat import ChatQuery
 from app.services.chat_manager import ChatManager
 from app.dependencies import get_db

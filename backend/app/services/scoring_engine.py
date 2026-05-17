@@ -1,4 +1,4 @@
-﻿class ScoringEngine:
+class ScoringEngine:
     def calculate_score(self, candidate, requirements):
         req_skills = [s.lower().strip() for s in requirements.get('required_skills', [])]
         min_exp = requirements.get('min_experience_years', 0)
