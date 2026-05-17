@@ -14,11 +14,12 @@ class EmbeddingStore:
         try:
             embeddings = []
             for text in texts:
-                resp = self.client.models.embed_content(
-                    model="embedding-001",
-                    contents=text
+                result = self.client.models.embed_content(
+                    model="models/text-embedding-004",
+                    contents=text,
+                    config={"output_dimensionality": 1536}
                 )
-                embeddings.append(resp.embeddings[0].values)
+                embeddings.append(result.embeddings[0].values)
                 time.sleep(0.1)
             
             data = []
