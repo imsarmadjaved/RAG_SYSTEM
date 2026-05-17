@@ -1,4 +1,4 @@
-from app.config import settings
+﻿from app.config import settings
 from app.dependencies import get_ai
 from loguru import logger
 
@@ -14,12 +14,20 @@ class ResponseGenerator:
             parts = [f"{'User' if m.get('role')=='user' else 'Assistant'}: {str(m.get('content',''))[:200]}" for m in chat_history[-4:]]
             history_text = "\n".join(parts)
         
-        prompt = f"""You are a helpful resume assistant. Answer naturally. Use resume data when available. For career questions, give general advice. Only refuse completely unrelated topics.
+        prompt = f"""You are a helpful resume assistant. Answer naturally using resume data when available.
 
-Resume:\n{ctx}\n\n{f'History:\n{history_text}\n\n' if history_text else ''}Q: {query}\nA:"""
+Resume:
+{ctx}
+
+{f'History:\n{history_text}\n\n' if history_text else ''}
+Q: {query}
+A:"""
         
         try:
-            resp = self.client.models.generate_content(model=settings.OPENAI_MODEL_CHAT, contents=prompt)
+            resp = self.client.models.generate_content(
+                model=settings.OPENAI_MODEL_CHAT,
+                contents=prompt
+            )
             answer = resp.text
             
             used = sum(1 for c in context_chunks if c.get('text','') and len(c.get('text',''))>20 and len(set(c.get('text','').lower().split()[:12]) & set(answer.lower().split())) >= 2)
@@ -31,4 +39,4 @@ Resume:\n{ctx}\n\n{f'History:\n{history_text}\n\n' if history_text else ''}Q: {q
             return {'answer': answer, 'confidence_score': round(ratio*100,1), 'confidence_level': conf, 'sources': sources}
         except Exception as e:
             logger.error(f"Generate error: {e}")
-            return {'answer': "Error generating response.", 'confidence_score': 0, 'confidence_level': 'low', 'sources': []}
+            return {'answer': "I had trouble processing that. Please try again.", 'confidence_score': 0, 'confidence_level': 'low', 'sources': []}
