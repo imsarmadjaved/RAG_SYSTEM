@@ -1,4 +1,4 @@
-﻿from app.config import settings
+ï»¿from app.config import settings
 from app.dependencies import get_ai, get_pc
 from loguru import logger
 

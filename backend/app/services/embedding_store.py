@@ -1,4 +1,4 @@
-﻿import time, re
+ï»¿import time, re
 from app.config import settings
 from app.dependencies import get_ai, get_pc
 from loguru import logger
@@ -15,7 +15,7 @@ class EmbeddingStore:
             embeddings = []
             for text in texts:
                 result = self.client.models.embed_content(
-                    model="models/gemini-models/gemini-embedding-001",
+                    model="models/gemini-embedding-001",
                     contents=text,
                     config={"output_dimensionality": 1536}
                 )
