@@ -1,34 +1,36 @@
-﻿import google.generativeai as genai
-from app.config import settings
+﻿from app.config import settings
+from app.dependencies import get_oai
 from loguru import logger
 
 class ResponseGenerator:
     def __init__(self):
-        self.model = genai.GenerativeModel(settings.OPENAI_MODEL_CHAT)
+        self.client = get_oai()
     
     async def generate(self, query, context_chunks, chat_history=None):
         ctx = "\n\n".join([f"[{c.get('chunk_type','').upper()}] {c.get('text','')}" for c in context_chunks if c.get('text')])
         
         history_text = ""
         if chat_history and len(chat_history) > 0:
-            parts = []
-            for m in chat_history[-4:]:
-                role = "User" if m.get("role") == "user" else "Assistant"
-                parts.append(f"{role}: {str(m.get('content',''))[:200]}")
-            history_text = "\n".join(parts)
-        
-        prompt = f"""You are a resume assistant. Answer naturally using resume data when available. For career questions, give general advice.
-
-Resume:
-{ctx}
-
-{f'Chat History:\n{history_text}\n\n' if history_text else ''}
-Q: {query}
-A:"""
+            try:
+                recent = chat_history[-4:]
+                parts = []
+                for m in recent:
+                    role = "User" if m.get("role") == "user" else "Assistant"
+                    content = str(m.get("content", ""))[:200]
+                    parts.append(f"{role}: {content}")
+                history_text = "\n".join(parts)
+            except:
+                history_text = ""
         
         try:
-            resp = self.model.generate_content(prompt)
-            answer = resp.text
+            resp = await self.client.chat.completions.create(
+                model=settings.OPENAI_MODEL_CHAT, temperature=0.3, max_tokens=800,
+                messages=[
+                    {"role":"system","content":"You are a resume assistant. Answer naturally using resume data when available. For career questions, give general advice. Only refuse completely unrelated topics. Be conversational."},
+                    {"role":"user","content":f"Resume:\n{ctx}\n\n{f'Chat History:\n{history_text}\n\n' if history_text else ''}Q: {query}\nA:"}
+                ]
+            )
+            answer = resp.choices[0].message.content
             
             used = 0
             answer_lower = answer.lower()
@@ -36,7 +38,8 @@ A:"""
                 text = c.get('text','')
                 if text and len(text) > 20:
                     words = set(text.lower().split()[:12])
-                    if sum(1 for w in words if w in answer_lower) >= 2: used += 1
+                    if sum(1 for w in words if w in answer_lower) >= 2:
+                        used += 1
             
             ratio = used / max(len(context_chunks), 1)
             conf = "high" if ratio > 0.6 else ("medium" if ratio > 0.3 else "low")
@@ -48,4 +51,4 @@ A:"""
             return {'answer': answer, 'confidence_score': round(ratio*100,1), 'confidence_level': conf, 'sources': sources}
         except Exception as e:
             logger.error(f"Generate error: {e}")
-            return {'answer': "Error generating response.", 'confidence_score': 0, 'confidence_level': 'low', 'sources': []}
+            return {'answer': "I had trouble processing that. Please try again.", 'confidence_score': 0, 'confidence_level': 'low', 'sources': []}
