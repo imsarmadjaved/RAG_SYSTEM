@@ -15,7 +15,7 @@ class EmbeddingStore:
             embeddings = []
             for text in texts:
                 result = self.client.models.embed_content(
-                    model="models/text-embedding-004",
+                    model="models/gemini-models/gemini-embedding-001",
                     contents=text,
                     config={"output_dimensionality": 1536}
                 )
