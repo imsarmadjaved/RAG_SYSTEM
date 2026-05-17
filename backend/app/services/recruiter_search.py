@@ -1,15 +1,15 @@
 ﻿from app.config import settings
-from app.dependencies import get_oai, get_pc
+from app.dependencies import get_ai, get_pc
 from loguru import logger
 
 class RecruiterSearchService:
     def __init__(self):
-        self.oai = get_oai()
+        self.ai = get_ai()
         self.index = get_pc().Index(settings.PINECONE_INDEX_CHUNKS)
     
     async def search(self, query_text, required_skills=None, min_experience=0, top_k=50):
         try:
-            emb = await self.oai.embeddings.create(model=settings.OPENAI_MODEL_EMBEDDING, input=query_text)
+            emb = await self.ai.embeddings.create(model=settings.OPENAI_MODEL_EMBEDDING, input=query_text)
             vec = emb.data[0].embedding
             
             # Get more results for better coverage
