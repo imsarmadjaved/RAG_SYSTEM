@@ -1,4 +1,4 @@
-from app.config import settings
+﻿from app.config import settings
 from app.dependencies import get_ai
 from loguru import logger
 
@@ -55,5 +55,5 @@ class ResponseGenerator:
             
             return {"answer": answer, "confidence_score": round(ratio*100,1), "confidence_level": conf, "sources": sources}
         except Exception as e:
-            logger.error("Generate error: " + str(e))
+            logger.error("Generate error: " + type(e).__name__ + " - " + str(e))
             return {"answer": "Error generating response.", "confidence_score": 0, "confidence_level": "low", "sources": []}
