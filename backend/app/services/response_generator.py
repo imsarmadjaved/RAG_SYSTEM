@@ -1,4 +1,4 @@
-﻿from app.config import settings
+ï»¿from app.config import settings
 from app.dependencies import get_ai
 from loguru import logger
 
@@ -11,7 +11,7 @@ class ResponseGenerator:
         
         history_text = ""
         if chat_history and len(chat_history) > 0:
-            parts = [f"{'User' if m.get('role')=='user' else 'Assistant'}: {str(m.get('content',''))[:200]}" for m in chat_history[-4:]]
+            parts = [f"{'User' if m.get('role')=='user' else 'Assistant'}: {str(m.get('content',''))[:100]}" for m in chat_history[-4:]]
             history_text = "\n".join(parts)
         
         prompt = f"""You are a helpful resume assistant. Answer naturally using resume data when available.
@@ -34,7 +34,7 @@ A:"""
             ratio = used / max(len(context_chunks), 1)
             conf = "high" if ratio > 0.6 else ("medium" if ratio > 0.3 else "low")
             
-            sources = [{'chunk_id': c.get('id',''), 'chunk_text': c.get('text','')[:200], 'chunk_type': c.get('chunk_type',''), 'relevance_score': c.get('rerank_score', c.get('score',0))} for c in context_chunks[:5]]
+            sources = [{'chunk_id': c.get('id',''), 'chunk_text': c.get('text','')[:100], 'chunk_type': c.get('chunk_type',''), 'relevance_score': c.get('rerank_score', c.get('score',0))} for c in context_chunks[:5]]
             
             return {'answer': answer, 'confidence_score': round(ratio*100,1), 'confidence_level': conf, 'sources': sources}
         except Exception as e:
