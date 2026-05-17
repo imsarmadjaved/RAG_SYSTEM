@@ -1,11 +1,11 @@
-﻿import json
+import json
 from app.config import settings
-from app.dependencies import get_oai
+from app.dependencies import get_ai
 from loguru import logger
 
 class Reranker:
     def __init__(self):
-        self.client = get_oai()
+        self.client = get_ai()
     
     async def rerank(self, query, chunks, top_n=5):
         if len(chunks) <= top_n: return chunks

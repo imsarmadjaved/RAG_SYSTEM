@@ -1,11 +1,11 @@
-﻿import json
+import json
 from app.config import settings
-from app.dependencies import get_oai
+from app.dependencies import get_ai
 from loguru import logger
 
 class RequirementExtractor:
     def __init__(self):
-        self.client = get_oai()
+        self.client = get_ai()
     
     async def extract_requirements(self, query):
         try:

@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+from datetime import datetime
 from app.utils.helpers import generate_session_id
 from app.services.query_processor import QueryProcessor
 from app.services.search_service import SearchService
