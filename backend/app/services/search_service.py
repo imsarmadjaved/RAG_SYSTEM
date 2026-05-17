@@ -1,4 +1,4 @@
-from app.config import settings
+﻿from app.config import settings
 from app.dependencies import get_ai, get_pc
 from loguru import logger
 
@@ -9,24 +9,18 @@ class SearchService:
     
     async def search(self, query_text, email, chunk_types=None, top_k=30):
         try:
+            logger.info("Search: " + query_text[:50] + " for " + email)
             resp = self.client.models.embed_content(model="models/gemini-embedding-001", contents=query_text, config={'output_dimensionality': 1536})
             vec = resp.embeddings[0].values
+            logger.info("Embedding done, querying Pinecone...")
             
             results = self.index.query(vector=vec, filter={"email": email}, top_k=top_k, include_metadata=True)
+            logger.info("Pinecone returned " + str(len(results.matches)) + " matches")
             
             chunks = []
             for m in results.matches:
-                meta = m.metadata
-                ctype = meta.get('chunk_type', 'general')
-                if chunk_types and ctype not in chunk_types: continue
-                chunks.append({
-                    'id': m.id, 'score': m.score,
-                    'text': meta.get('normalized_text', meta.get('raw_text', '')),
-                    'chunk_type': ctype, 'skills': meta.get('skills', []),
-                    'experience_years': meta.get('experience_years', 0),
-                    'chunk_index': meta.get('chunk_index', 0)
-                })
+                ...
             return chunks
         except Exception as e:
-            logger.error(f"Search failed: {e}")
+            logger.error("Search failed: " + str(e))
             return []
