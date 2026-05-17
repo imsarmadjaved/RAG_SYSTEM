@@ -1,15 +1,15 @@
 ﻿from motor.motor_asyncio import AsyncIOMotorClient
 from pinecone import Pinecone
-from openai import AsyncOpenAI
+import google.generativeai as genai
 from loguru import logger
 from app.config import settings
 
 mongo_db = None
 pinecone_client = None
-openai_client = None
+genai_configured = False
 
 async def init_db():
-    global mongo_db, pinecone_client, openai_client
+    global mongo_db, pinecone_client, genai_configured
     try:
         mongo = AsyncIOMotorClient(settings.MONGODB_URL)
         mongo_db = mongo[settings.MONGODB_DB_NAME]
@@ -23,8 +23,9 @@ async def init_db():
         pinecone_client = Pinecone(api_key=settings.PINECONE_API_KEY)
         logger.info("Pinecone ready")
         
-        openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-        logger.info("OpenAI ready")
+        genai.configure(api_key=settings.OPENAI_API_KEY)
+        genai_configured = True
+        logger.info("Gemini ready")
     except Exception as e:
         logger.error(f"Init failed: {e}")
         raise
@@ -33,7 +34,6 @@ async def close_db():
     global mongo_db
     if mongo_db is not None:
         mongo_db.client.close()
-        logger.info("MongoDB closed")
 
 def get_db():
     if mongo_db is None: raise RuntimeError("DB not initialized")
@@ -42,7 +42,3 @@ def get_db():
 def get_pc():
     if pinecone_client is None: raise RuntimeError("Pinecone not initialized")
     return pinecone_client
-
-def get_oai():
-    if openai_client is None: raise RuntimeError("OpenAI not initialized")
-    return openai_client

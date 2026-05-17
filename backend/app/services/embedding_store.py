@@ -1,11 +1,11 @@
 ﻿import time, re
+import google.generativeai as genai
 from app.config import settings
-from app.dependencies import get_oai, get_pc
+from app.dependencies import get_pc
 from loguru import logger
 
 class EmbeddingStore:
     def __init__(self):
-        self.oai = get_oai()
         self.index = get_pc().Index(settings.PINECONE_INDEX_CHUNKS)
     
     async def create_embeddings(self, chunks, email):
@@ -17,31 +17,30 @@ class EmbeddingStore:
         
         try:
             embeddings = []
-            for i in range(0, len(texts), 50):
-                batch = texts[i:i+50]
-                resp = await self.oai.embeddings.create(model=settings.OPENAI_MODEL_EMBEDDING, input=batch)
-                embeddings.extend([e.embedding for e in resp.data])
-                if i + 50 < len(texts): time.sleep(0.2)
+            for text in texts:
+                result = genai.embed_content(
+                    model="models/text-embedding-004",
+                    content=text,
+                    task_type="retrieval_document"
+                )
+                embeddings.append(result['embedding'])
+                time.sleep(0.1)
             
             data = []
             for c, emb in zip(chunks, embeddings):
                 extracted = c.get('extracted_data', {})
-                
-                # Calculate experience
                 exp_years = 0
                 for exp in extracted.get('experience', []):
                     if isinstance(exp, dict):
                         try: exp_years += float(exp.get('duration_years', 0))
                         except: pass
                 
-                # Also check text
                 if exp_years == 0:
-                    years_match = re.findall(r'(\d+)\+?\s*years?', c.get('text', ''), re.IGNORECASE)
-                    if years_match:
-                        try: exp_years = max(float(y) for y in years_match)
+                    years = re.findall(r'(\d+)\+?\s*years?', c.get('text', ''), re.IGNORECASE)
+                    if years:
+                        try: exp_years = max(float(y) for y in years)
                         except: pass
                 
-                # Get education text
                 edu = ""
                 for e in extracted.get('education', []):
                     if isinstance(e, dict):
@@ -63,16 +62,14 @@ class EmbeddingStore:
                     }
                 })
             
-            logger.info(f"Created {len(data)} embeddings, exp={exp_years}")
+            logger.info(f"Created {len(data)} embeddings")
             return data
         except Exception as e:
             logger.error(f"Embedding failed: {e}")
             raise
     
     async def store_in_pinecone(self, data):
-        ids = []
-        for d in data:
-            ids.append(d['id'])
+        ids = [d['id'] for d in data]
         for i in range(0, len(data), 100):
             self.index.upsert(vectors=data[i:i+100])
         logger.info(f"Stored {len(ids)} vectors")
