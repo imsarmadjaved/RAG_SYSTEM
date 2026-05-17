@@ -1,4 +1,4 @@
-ï»¿import time, re
+Ã¯Â»Â¿import time, re
 from app.config import settings
 from app.dependencies import get_ai, get_pc
 from loguru import logger
@@ -20,7 +20,7 @@ class EmbeddingStore:
                     config={"output_dimensionality": 1536}
                 )
                 embeddings.append(result.embeddings[0].values)
-                time.sleep(0.1)
+                time.sleep(0.05)
             
             data = []
             for c, emb in zip(chunks, embeddings):
