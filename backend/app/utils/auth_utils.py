@@ -1,24 +1,19 @@
 ﻿from datetime import datetime, timedelta
 from jose import jwt
-import hashlib
-import secrets
+from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 from bson import ObjectId
 from app.config import settings
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 def hash_password(password):
-    salt = secrets.token_hex(16)
-    return salt + ":" + hashlib.sha256((password + salt).encode()).hexdigest()
+    return pwd_context.hash(password)
 
 def verify_password(plain, hashed):
-    try:
-        salt, hash_val = hashed.split(":")
-        return hashlib.sha256((plain + salt).encode()).hexdigest() == hash_val
-    except:
-        return False
+    return pwd_context.verify(plain, hashed)
 
 def create_token(data, expires_delta=None, token_type="access"):
     to_encode = data.copy()
