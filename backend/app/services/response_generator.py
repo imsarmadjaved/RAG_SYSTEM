@@ -16,10 +16,11 @@ class ResponseGenerator:
         history_text = ""
         if chat_history and len(chat_history) > 0:
             parts = []
-            for m in chat_history[-4:]:
-                role = "User" if m.get("role") == "user" else "Assistant"
-                parts.append(role + ": " + str(m.get("content",""))[:100])
-            history_text = "\n".join(parts)
+            if isinstance(chat_history, list):
+                for m in chat_history[-4:]:
+                    role = "User" if m.get("role") == "user" else "Assistant"
+                    parts.append(role + ": " + str(m.get("content",""))[:100])
+                history_text = "\n".join(parts)
         
         prompt = "You are a helpful resume assistant.\n\nResume:\n" + ctx
         if history_text:

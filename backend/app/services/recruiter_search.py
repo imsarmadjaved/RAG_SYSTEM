@@ -1,4 +1,4 @@
-from app.config import settings
+﻿from app.config import settings
 from app.dependencies import get_ai, get_pc
 from loguru import logger
 
@@ -9,8 +9,12 @@ class RecruiterSearchService:
     
     async def search(self, query_text, required_skills=None, min_experience=0, top_k=50):
         try:
-            emb = await self.ai.embeddings.create(model=settings.OPENAI_MODEL_EMBEDDING, input=query_text)
-            vec = emb.data[0].embedding
+            resp = self.ai.models.embed_content(
+            model="models/gemini-embedding-001",
+            contents=query_text,
+            config={'output_dimensionality': 1536}
+        )
+        vec = resp.embeddings[0].values
             
             # Get more results for better coverage
             results = self.index.query(vector=vec, top_k=top_k, include_metadata=True)
